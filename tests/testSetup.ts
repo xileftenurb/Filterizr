@@ -83,6 +83,11 @@ const fakeDom = `
             </div>
         </div>
     </div>
+    <div>
+    <button data-pagination-next></button>
+    <p data-pagination-text="page {{currentPage}} of {{lastPage}}"></p>
+    <button data-pagination-previous></button>
+    <div>
 </div>
 `;
 

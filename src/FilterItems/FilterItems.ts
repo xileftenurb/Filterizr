@@ -52,8 +52,7 @@ export default class FilterItems implements Destructible, Styleable {
   /**
    * returns all item that are positive, this mean all the items that should be keeped.
    */
-  public getFiltered(filter: Filter, searchTerm : string, pagination : Pagination): FilterItem[] {
-    searchTerm = searchTerm || ""; //replace empty search term by empty string, who always match.
+  public getFiltered(filter: Filter, searchTerm : string = "", pagination : Pagination = null): FilterItem[] {
     return this.filterItems.filter(this.getFilterPredicate(filter, searchTerm, pagination, true));
   }
 
@@ -61,8 +60,7 @@ export default class FilterItems implements Destructible, Styleable {
    * returns all item that are negative, this mean all the items that should be removed.
    * the item is not keeped if the condition described in `getFiltered` is false.
    */
-  public getFilteredOut(filter: Filter, searchTerm : string, pagination : Pagination): FilterItem[] {
-    searchTerm = searchTerm || ""; //replace empty search term by empty string, who always match.
+  public getFilteredOut(filter: Filter, searchTerm : string = "", pagination : Pagination = null): FilterItem[] {
     return this.filterItems.filter(this.getFilterPredicate(filter, searchTerm, pagination, false));
   }
 

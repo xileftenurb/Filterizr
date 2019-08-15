@@ -26,6 +26,10 @@ export default class FilterizrOptions {
     return this.options.setupControls;
   }
 
+  public get isPaginatorTextEnabled(): boolean {
+    return this.options.pagination && this.options.pagination.textEnabled;
+  }
+
   public get controlsSelector(): string {
     return this.options.controlsSelector;
   }

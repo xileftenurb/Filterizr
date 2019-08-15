@@ -12,6 +12,8 @@ export default class FilterControls implements Destructible {
   private shuffleControls: EventReceiver;
   private sortAscControls: EventReceiver;
   private sortDescControls: EventReceiver;
+  private paginatorNextControls: EventReceiver;
+  private paginatorPreviousControls: EventReceiver;
 
   /**
    * @param filterizr keep a ref to the Filterizr object to control actions
@@ -39,6 +41,14 @@ export default class FilterControls implements Destructible {
     this.sortDescControls = new EventReceiver(
       document.querySelectorAll(`${selector}[data-sortDesc]`)
     );
+
+    this.paginatorNextControls = new EventReceiver(
+      document.querySelectorAll(`${selector}[data-pagination-next]`)
+    );
+    this.paginatorPreviousControls = new EventReceiver(
+      document.querySelectorAll(`${selector}[data-pagination-previous]`)
+    );
+    
 
     this.initialize();
   }
@@ -93,6 +103,15 @@ export default class FilterControls implements Destructible {
         `${selector}[data-sortOrder]`
       ) as HTMLInputElement).value;
       filterizr.sort(sortAttr, 'desc');
+    });
+
+    // pagination EventReceiver
+    this.paginatorNextControls.on('click', () : void => {
+      filterizr.nextPage();
+    });
+
+    this.paginatorPreviousControls.on('click', () : void => {
+      filterizr.previousPage();
     });
   }
 }

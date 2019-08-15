@@ -22,6 +22,7 @@ export interface BaseOptions {
 }
 
 export interface PaginationOptions {
-  pageSize : number;
-  currentPage : number;
+  pageSize? : number;
+  currentPage? : number;
+  textEnabled? : boolean;
 }

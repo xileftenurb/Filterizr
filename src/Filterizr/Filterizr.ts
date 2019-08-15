@@ -11,6 +11,8 @@ import FilterItem from '../FilterItem';
 import Spinner from '../Spinner';
 import makeLayoutPositions from '../makeLayoutPositions';
 import installAsJQueryPlugin from './installAsJQueryPlugin';
+import { expandTemplate } from '../utils/expandTextTemplate';
+import FilterPaginator from '../FilterPaginator';
 
 //@ts-ignore
 const imagesLoaded = require('imagesloaded');
@@ -35,6 +37,7 @@ export default class Filterizr implements Destructible {
   private filterControls?: FilterControls;
   private imagesHaveLoaded: boolean;
   private spinner?: Spinner;
+  private paginator : FilterPaginator;
 
   public constructor(
     selectorOrNode: string | HTMLElement = '.filtr-container',
@@ -46,6 +49,7 @@ export default class Filterizr implements Destructible {
       areControlsEnabled,
       controlsSelector,
       isSpinnerEnabled,
+      isPaginatorTextEnabled
     } = this.options;
 
     this.windowEventReceiver = new EventReceiver(window);
@@ -61,6 +65,10 @@ export default class Filterizr implements Destructible {
     }
     if (isSpinnerEnabled) {
       this.spinner = new Spinner(this.filterContainer, this.options);
+    }
+
+    if(isPaginatorTextEnabled) {
+      this.paginator = new FilterPaginator(this, this.options)
     }
 
     this.initialize();
@@ -213,8 +221,7 @@ export default class Filterizr implements Destructible {
   public gotoPage(page : number) {
     const opt = this.options.get();
     if(opt.pagination) {
-      const nbrItem = this.filterItems.getFiltered(this.options.filter, this.options.searchTerm, null).length;
-      const lastPage = Math.floor(nbrItem / opt.pagination.pageSize);
+      const {lastPage} = this.getPaginationInformation()
       if(page < 0) {
         page = 0;
       } else if(page > lastPage) {
@@ -222,15 +229,15 @@ export default class Filterizr implements Destructible {
       }
       opt.pagination.currentPage = page;
     }
+
     this.render();
   }
 
   public nextPage() {
     const opt = this.options.get();
     if(opt.pagination) {
-      const nbrItem = this.filterItems.getFiltered(this.options.filter, this.options.searchTerm, null).length;
-      const lastPage = Math.floor(nbrItem / opt.pagination.pageSize);
-      let page = opt.pagination.currentPage + 1;
+      const {currentPage, lastPage} = this.getPaginationInformation()
+      let page = currentPage + 1;
       if(page > lastPage) {
         page = lastPage;
       }
@@ -249,6 +256,23 @@ export default class Filterizr implements Destructible {
       opt.pagination.currentPage = page;
     }
     this.render();
+  }
+
+  /**
+   * return information about pagination useful for display
+   */
+  public getPaginationInformation() {
+    const opt = this.options.get();
+    const nbrItem = this.filterItems.getFiltered(this.options.filter, this.options.searchTerm, null).length;
+    if(opt.pagination) {
+      const lastPage = Math.floor(nbrItem / opt.pagination.pageSize);
+      const currentPage = opt.pagination.currentPage;
+      const firstItem = (currentPage * opt.pagination.pageSize) + 1;
+      const lastItem = currentPage * Math.min((opt.pagination.pageSize + 1), nbrItem);
+      return { nbrItem, lastPage, currentPage, firstItem, lastItem };
+    } else {
+      return { nbrItem };
+    }
   }
 
   private render(): void {
@@ -290,7 +314,8 @@ export default class Filterizr implements Destructible {
   }
 
   private bindEvents(): void {
-    const { filterItems, windowEventReceiver } = this;
+    const { filterItems, windowEventReceiver,  } = this;
+    
     windowEventReceiver.on('resize', debounce(
       (): void => {
         filterItems.styles.updateWidthWithTransitionsDisabled();
